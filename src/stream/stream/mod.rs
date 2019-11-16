@@ -124,6 +124,7 @@ cfg_unstable! {
 
     use count::CountFuture;
     use partition::PartitionFuture;
+    //use partition_map::PartitionMapFuture;
 
     pub use merge::Merge;
     pub use flatten::Flatten;
@@ -136,6 +137,7 @@ cfg_unstable! {
     mod flatten;
     mod flat_map;
     mod partition;
+    //mod partition_map;
     mod timeout;
     mod throttle;
 }
@@ -1349,6 +1351,45 @@ extension_trait! {
         {
             PartitionFuture::new(self, f)
         }
+
+/*        #[doc = r#"
+            A combinator that applies a function to every element in a stream
+            creating two collections from it.
+
+            # Examples
+
+            Basic usage:
+
+            ```
+            # fn main() { async_std::task::block_on(async {
+            #
+            use async_std::prelude::*;
+            use async_std::stream;
+
+            let (oks, ers): (Vec<i32>, Err<()>) = stream::from_iter(vec![Ok(1), Err(()), Ok(3)])
+                .partition_map(Either::from).await;
+
+            assert_eq!(oks, vec![1, 3]);
+            assert_eq!(errs, vec![()]);
+
+            #
+            # }) }
+            ```
+        "#]
+        #[cfg(feature = "unstable")]
+        #[cfg_attr(feature = "docs", doc(cfg(unstable)))]
+        fn partition_map<F, A, B, L, R>(
+            self,
+            f: F,
+        ) -> impl Future<Output = (A, B)> [PartitionMapFuture<Self, F, A, B>]
+        where
+            Self: Sized,
+            F: FnMut(&Self::Item) -> Either<L, R>,
+            A: Default + Extend<L>,
+            B: Default + Extend<R>,
+        {
+            PartitionMapFuture::new(self, f)
+        }*/
 
         #[doc = r#"
             Call a closure on each element of the stream.
